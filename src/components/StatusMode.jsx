@@ -1,22 +1,35 @@
 import React, { useEffect, useState } from 'react'
+import Paragraphs  from '../../data.json';
+import { Timer } from './Timer';
+
 
 export const StatusMode = () => {
-         const [isStatus,setIsStatus]=useState('');
-    const [isMode,setIsMode]=useState('');
-   // const [isTimed,setIsTimed]=useState(false)
-   // const [countUp,setCountUp]=useState(1)
-    const [countDown,setCountDown]=useState(60)
+    const [isMode,setIsMode]=useState('Timed(60s)');
+    const [difficulty,setDifficulty]=useState('Easy')
+    const [typed, setTyped]=useState('')
+    const [text,setText]=useState('')
+    const [isRunning,setIsRunning]=useState(false)
     const Difficulty=["Easy","Medium", "Hard"]
     const mode=["Timed(60s)","Passage"]
+
+    const generateText=(diff)=>{
+       const key = diff || 'Easy'
+    const list = Paragraphs[key] || []
+    if (!Array.isArray(list) || list.length === 0) return ''
+    const index = Math.floor(Math.random() * list.length)
+    const item = list[index]
+    return (item && (item.text || item)) || ''
+
+    }
+    console.log(difficulty)
     useEffect(()=>{
-        const interval=setInterval(()=>{
-            
-                setCountDown((prev)=>(prev>0?prev-1:0))
-            
-            // setCountUp((prev)=>prev+1)
-        },1000)
-        return ()=>clearInterval(interval)
-    },[])
+        setText(generateText(difficulty))
+    },[difficulty])
+    
+    const handleChange=(e)=>{
+        const value= e.target.value
+        setTyped(value)
+    }
   return (
     <div className='text-white  w-full py-5 px-50'>
 
@@ -36,10 +49,10 @@ export const StatusMode = () => {
                 <span className='font-bold'>100%</span>
                </div>
                <div className="border-l border-neutral-800 h-5 mx-4"></div>
-               <div>
-                
+
+               <div className='flex'>
                 <span className='text-neutral-400 px-1'>Time:</span>
-                <span className='font-bold font-sora'>{countDown}</span>
+                <span className='font-bold font-sora'>{<Timer isrunning={isRunning}/>}</span>
                </div>
             </div>
             {/**modes */}
@@ -49,9 +62,11 @@ export const StatusMode = () => {
                     {Difficulty.map((dif)=>(
                         <button 
                         key={dif}
-                        onClick={()=>setIsStatus(dif)}
+                        onClick={()=>{
+                            setDifficulty(dif)
+                        }}
                         className={`block border rounded-lg hover:scale-105 focus:outline-2 focus:outline-blue-400 active active:scale-95 transition-all px-1 ${
-                           isStatus===dif?'text-blue-400 border-blue-400':'' }`}
+                           difficulty===dif?'text-blue-400 border-blue-400':'' }`}
                         >{dif}</button>
                     ))}
                 </div>
@@ -74,6 +89,18 @@ export const StatusMode = () => {
             </div>
         </div>
         <hr className='mt-2 text-neutral-500'/>
+       <p className='text-white cursor-text' >
+        {text}
+      </p>
+       <hr className='mt-2 text-neutral-500'/>
+      <textarea
+        value={typed}
+        onChange={handleChange}
+        onClick={()=>setIsRunning(true)}
+        placeholder='Click Start to begin typing or click the text' 
+        className="w-full mt-3 p-2 rounded bg-neutral-900 text-white"
+        rows={4}
+      />
     </div>
   )
 }

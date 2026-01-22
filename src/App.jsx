@@ -1,7 +1,9 @@
 
 
+import { BetResult } from "./components/BetResult"
+import { FirstResult } from "./components/FirstResult"
 import { Header } from "./components/Header"
-import { Paragraphs } from "./components/Paragraphs"
+import { Results } from "./components/Results"
 import { StatusMode } from "./components/statusMode"
 
 //import { useState } from "react"
@@ -13,8 +15,9 @@ function App() {
     <div className="w-full h-screen  bg-neutral-900">
       <Header/>
       <StatusMode/>
+      {/* <StatusMode/>
       <Paragraphs/>
-      
+       */}
     </div>
   )
 }

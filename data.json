@@ -1,5 +1,5 @@
 {
-  "easy": [
+  "Easy": [
     {
       "id": "easy-1",
       "text": "The sun rose over the quiet town. Birds sang in the trees as people woke up and started their day. It was going to be a warm and sunny morning."
@@ -41,7 +41,7 @@
       "text": "The music played softly in the room. She closed her eyes and let the sounds wash over her. It was a simple song but it made her feel at peace."
     }
   ],
-  "medium": [
+  "Medium": [
     {
       "id": "medium-1",
       "text": "Learning a new skill takes patience and consistent practice. Whether you're studying a language, picking up an instrument, or mastering a sport, the key is to show up every day. Small improvements compound over time, and before you know it, you'll have made remarkable progress."
@@ -83,7 +83,7 @@
       "text": "Night markets come alive after sunset in cities across Asia. Vendors set up stalls selling everything from grilled skewers to handmade crafts. The air fills with enticing aromas and the buzz of conversation. Locals and tourists alike wander through, sampling street food and hunting for bargains."
     }
   ],
-  "hard": [
+  "Hard": [
     {
       "id": "hard-1",
       "text": "The philosopher's argument hinged on a seemingly paradoxical assertion: that absolute freedom, pursued without constraint, inevitably undermines itself. \"Consider,\" she wrote, \"how the libertarian ideal—when taken to its logical extreme—produces conditions in which the powerful dominate the weak, thereby eliminating freedom for the majority.\" Her critics dismissed this as sophistry; her supporters hailed it as profound."
