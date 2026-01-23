@@ -6,40 +6,39 @@ import Starb from '../assets/images/pattern-star-2.svg'
 
 export const Results = ({speed,accuracy,correct,error,onRestart}) => {
   return (
-    <div className="text-neutral-100 py-25 justify-items-center justify-center px-50 w-full">
-        <div><img src={Stara} alt="star" className='block absolute  top-100 right-50' /></div>
-        <div><img src={Starb} alt="" className='block absolute  top-50 left-50'/></div>
-        <div>
-            <span className=' block p-2 rounded-full  bg-[#73ff001f]'>
-                <span className=' block p-2 rounded-full  bg-[#00800075]'>
-                    <img src={Right} alt="Completed" className='border-none' />
-                </span>
-                </span>
+    <div className="text-neutral-100 py-25 justify-items-center justify-center md:px-50 w-full">
+            <div><img src={Stara} alt="star" className='block absolute  bottom-10 right-10 w-10 sm:top-100 sm:right-30' /></div>
+            <div><img src={Starb} alt="" className='block absolute  top-30 left-4 w-5 sm:left-10'/></div>
+            <div>
+                <span className=' block p-2 rounded-full  bg-[#73ff001f]'>
+                    <span className=' block p-2 rounded-full  bg-[#00800075]'>
+                        <img src={Right} alt="Completed" className='border-none w-10' />
+                    </span>
+                    </span>
+            </div>
+            <div className='m-4 justify-items-center w-full px-4'>
+                <h2 className='text-neutral-100 font-bold text-2xl text-center'>Test Complete!</h2>
+                <p className='text-neutral-500 text-center'>Solid run. Keep pushing to beat your high score.</p></div>
+    
+            <div className='sm:flex w-full sm:flex-1 p-5 justify-items-center justify-center'>
+                <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>
+                    <span className='text-neutral-500'>WPM:</span>
+                    <p className='font-bold md:text-2xl'>{speed}</p>
+                </div>
+    
+                <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>
+                    <span className='text-neutral-500'>Accuracy:</span>
+                    <p className='font-bold text-red-500 md:text-2xl'>{accuracy}%</p>
+                </div>
+    
+                <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>
+                    <span className='text-neutral-500'>Characters:</span>
+                    <p className='font-bold md:text-2xl'><span className='text-green-500'>{correct}</span>/<span className='text-red-500'>{error}</span></p>
+                </div>
+            </div>
+             <div className='m-10'>
+                    <button onClick={()=>onRestart?.()} className='block border p-2 rounded-lg bg-neutral-100 text-neutral-900 font-bold'>Go Again<span className='text-neutral-500'><img src={Restart} alt=" restart" className='inline filter invert sepia saturate-200 hue-rotate-180 p-0.5'/></span> </button>
+                </div>
         </div>
-        <div className='m-4 justify-items-center'>
-            <h2 className='text-neutral-100 font-bold text-2xl'>Test Complete!</h2>
-            <p className='text-neutral-500 text-[0.75em]'>Solid run. keep pushing to beat your high score.</p>
-        </div>
-
-        <div className='flex w-fit flex-1 p-5'>
-            <div className='border w-30 m-2 p-2 border-neutral-500 rounded-lg '>
-                <span className='text-neutral-500'>WPM:</span>
-                <p className='font-bold'>{speed}</p>
-            </div>
-
-            <div className='border w-30 m-2 p-2 border-neutral-500 rounded-lg '>
-                <span className='text-neutral-500'>Accuracy:</span>
-                <p className='font-bold text-red-500'>{accuracy}%</p>
-            </div>
-
-            <div className='border w-30 m-2 p-2 border-neutral-500 rounded-lg '>
-                <span className='text-neutral-500'>Characters:</span>
-                <p className='font-bold'><span className='text-green-500'>{correct}</span>/<span className='text-red-500'>{error}</span></p>
-            </div>
-        </div>
-         <div className='m-10'>
-                <button className='block border p-2 rounded-lg bg-neutral-100 text-neutral-900 font-bold' onClick={()=>onRestart?.()}>Go Again <span className='text-neutral-500'><img src={Restart} alt=" restart" className='inline filter invert sepia saturate-200 hue-rotate-180 p-0.5'/></span> </button>
-            </div>
-    </div>
   )
 }

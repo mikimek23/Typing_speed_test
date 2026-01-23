@@ -4,7 +4,7 @@ import Restart from '../assets/images/icon-restart.svg'
 const Displaytext = ({ text, typed, showMode, setShowMode, setIsRunning, inputRef, handleChange, onRestart }) => {
   return (
     <div className='relative h-[calc(100hv-40px)]'>
-      <div className='w-full fixed top-34 h-screen inset-0 overflow-hidden justify-items-center content-center bg-white/5 backdrop-blur-xs box-border' 
+      <div className='w-full fixed top-60 md:top-54 lg:top-39 h-screen inset-0 overflow-hidden justify-items-center content-center backdrop-blur-xs box-border' 
         onClick={() => {
           setShowMode(true)
           setIsRunning(true)
@@ -25,7 +25,7 @@ const Displaytext = ({ text, typed, showMode, setShowMode, setIsRunning, inputRe
         <p className="font-bold">Or click the text and start typing</p>
       </div>
 
-      <p className='text-neutral-400 cursor-text text-3xl py-5'>
+      <p className='text-neutral-400 cursor-text text-3xl py-5 text-left'>
         {text.split('').map((char, index) => {
           let className = ''
           if (index < typed.length) {
@@ -42,7 +42,7 @@ const Displaytext = ({ text, typed, showMode, setShowMode, setIsRunning, inputRe
           )
         })}
       </p>
-      <hr className='mt-2 text-neutral-500'/>
+      <hr className='mt-2 w-full text-neutral-600'/>
       <div className='m-5 justify-items-center'>
         <button onClick={() => onRestart?.()} className='block  p-2 rounded-lg bg-neutral-800 text-neutral-100 font-bold' hidden={!showMode}>Restart Test<span className='text-neutral-500'><img src={Restart} alt=" restart" className=' inline filter  sepia saturate-200 hue-rotate-180 p-1'/></span> </button>
       </div>

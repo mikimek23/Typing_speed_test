@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Paragraphs  from '../../data.json';
 import { Timer } from './Timer';
 import Displaytext from './Displaytext'
+import { DropDown } from './DropDown';
 
 
 export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError, setStatus:parentStatus}) => {
@@ -17,7 +18,7 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
     const [showMode,setShowMode]=useState(false)
     const [correct,setCorrect]=useState(0)
     const [typing,setTyping]=useState(true)
-    const [status,setStatus]=useState('idle')//idle || running || finishid
+    const [status,setStatus]=useState('idle')
     const [timerKey, setTimerKey] = useState(0);
     
  
@@ -84,7 +85,8 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         setCorrect(userInput)
 
     })
-//9784150
+
+    
     useEffect(()=>{
         // finish status
         if(status!='running') return;
@@ -102,38 +104,42 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
             setSpeed?.(wpm)
             setFinalAccuracy?.(accuracy)
             setFinalCorrect?.(correct)
-            setError?.(text.length-correct)
+            setError?.(typed.length-correct)
             parentStatus?.("result")
         }
     })
     
   return (
-    <div className='text-neutral-100  w-full py-5 px-50'>
+    <div className='text-neutral-100  w-full py-5 lg:px-20 px-4'>
 
         {/* status info  and mode*/}
-        <div className='flex justify-between mt-20'>
+        <div className='lg:flex justify-between mt-20 '>
             {/* status */}
-            <div className='flex justify-between w-fit pr-40'>
-               <div>
-                <span className='text-neutral-400 px-1'>WPM:</span>
-                <span className='font-bold'>{wpm}</span>
+            <div className='flex justify-between md:justify-start w-fit  py-2 text-2xl lg:text-[1em] h-fit  '>
+               <div className="flex flex-col md:flex-row h-fit ">
+                <span className='text-neutral-400 px-1   text-center'>WPM:</span>
+                <span className='font-bold  text-center '>{wpm}</span>
                </div>
 
-               <div className="border-l border-neutral-800 h-5 mx-4"></div>
+               <div className="border-l border-neutral-800 h-10 lg:h-5 mx-4"></div>
 
-               <div>
-                <span className='text-neutral-400 px-1'>Accuracy:</span>
-                <span className={`font-bold ${isRunning?'text-red-500':''}`}>{accuracy}%</span>
+               <div className="flex flex-col md:flex-row h-fit">
+                <span className='text-neutral-400 px-1 block text-center'>Accuracy:</span>
+                <span className={`block text-center font-bold ${isRunning?'text-red-500':''}`}>{accuracy}%</span>
                </div>
-               <div className="border-l border-neutral-800 h-5 mx-4"></div>
+               <div className="border-l border-neutral-800 h-10 lg:h-5 mx-4"></div>
 
-               <div className='flex'>
-                <span className='text-neutral-400 px-1'>Time:</span>
-                <span className={`font-bold font-sora ${isRunning?'text-yellow-400':''}`}>{<Timer key={timerKey} isRunning={isRunning} mode={isMode} onTimeChange={setElapsedTime}/>}</span>
+               <div className="flex flex-col md:flex-row  h-fit">
+                <span className='text-neutral-400 px-1 block text-center'>Time:</span>
+                <span className={`block text-center font-bold font-sora ${isRunning?'text-yellow-400':''}`}>{<Timer key={timerKey} isRunning={isRunning} mode={isMode} onTimeChange={setElapsedTime}/>}</span>
                </div>
             </div>
+
+
             {/**modes */}
-            <div className='flex justify-between w-fit '>
+            <div className='flex lg:justify-end w-full '>
+                {/* Desktop View */}
+                <div  className='md:flex lg:justify-between w-fit hidden h-fit py-2'>
                 <div className="flex gap-2">
                     <span className='text-neutral-400 px-1'>Difficulty:</span>
                     {Difficulty.map((dif)=>(
@@ -142,7 +148,7 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
                         onClick={()=>{
                             setDifficulty(dif)
                         }}
-                        className={`block border rounded-lg hover:text-blue-400 hover:border-blue-400' focus:outline-2 focus:outline-blue-400 active active:scale-95 transition-all px-1 ${
+                        className={`block border rounded-lg hover:text-blue-400 hover:border-blue-400' focus:outline-2 focus:outline-blue-400 active active:scale-95 transition-all px-1 lg:max-w-fit ${
                            difficulty===dif?'text-blue-400 border-blue-400':'' }`}
                         disabled={isRunning}>{dif}</button>
                     ))}
@@ -163,9 +169,24 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
                         disabled={isRunning}>{mo}</button>
                     ))}
                 </div>
+                </div>
+
+                {/* Mobile View */}
+                <div className='flex gap-2 justify-evenly w-full md:hidden'>
+                    <DropDown
+                    options={Difficulty}
+                    SetOptions={setDifficulty}
+                    isRunning={isRunning}
+                    />
+                    <DropDown
+                    options={mode}
+                    SetOptions={setIsMode}
+                    isRunning={isRunning}
+                    />
+                </div>
             </div>
         </div>
-        <hr className='mt-2 text-neutral-500'/>
+        <hr className='mt-3 text-neutral-600'/>
                 <Displaytext
                     text={text}
                     typed={typed}

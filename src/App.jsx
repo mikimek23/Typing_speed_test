@@ -37,7 +37,7 @@ const handleRestart = () => {
   setStatus('Typing')
 }
   return (
-    <div className="w-screen h-screen  bg-neutral-900">
+    <div className="w-screen min-h-screen  bg-neutral-900">
       <Header
       PersonalBest={personalBest}
       />
