@@ -1,23 +1,79 @@
 
 
+import { useEffect, useState } from "react"
 import { BetResult } from "./components/BetResult"
 import { FirstResult } from "./components/FirstResult"
 import { Header } from "./components/Header"
 import { Results } from "./components/Results"
-import { StatusMode } from "./components/statusMode"
+import { StatusMode } from "./components/StatusMode"
 
-//import { useState } from "react"
-//import { StartComp } from "./components/StartComp"
 
 function App() {
- // const [showModal,setShowModal]=useState(true)
+const [speed,setSpeed]=useState(0)
+const [finalAccuracy,setFinalAccuracy]=useState(100)
+const [finalCorrect,setFinalCorrect]=useState(0)
+const [error,setError]=useState(0)
+const [status,setStatus]=useState("Typing")
+const [personalBest,setPersonalBest]=useState(0)
+const [trial,setTrial]=useState('')
+useEffect(() => {
+  setPersonalBest(prevBest => {
+    if (speed > prevBest) {
+      setTrial(prevBest === 0 ? "first" : "high");
+      return speed;
+    }else{
+      setTrial('')
+    }
+    return prevBest;
+  });
+}, [speed]);
+
+const handleRestart = () => {
+  setSpeed(0)
+  setFinalAccuracy(100)
+  setFinalCorrect(0)
+  setError(0)
+  setTrial('')
+  setStatus('Typing')
+}
   return (
-    <div className="w-full h-screen  bg-neutral-900">
-      <Header/>
-      <StatusMode/>
-      {/* <StatusMode/>
-      <Paragraphs/>
-       */}
+    <div className="w-screen h-screen  bg-neutral-900">
+      <Header
+      PersonalBest={personalBest}
+      />
+     {status==="Typing"?<StatusMode
+      setSpeed={setSpeed}
+      setFinalAccuracy={setFinalAccuracy}
+      setFinalCorrect={setFinalCorrect}
+      setError={setError}
+      setStatus={setStatus}
+      onRestart={handleRestart}
+      />
+      :(trial==="first"?
+      <FirstResult
+        speed={speed}
+        accuracy={finalAccuracy}
+        correct={finalCorrect}
+        error={error}
+        onRestart={handleRestart}
+      />
+      :(trial==="high"?
+        <BetResult
+          speed={speed}
+          accuracy={finalAccuracy}
+          correct={finalCorrect}
+          error={error}
+          onRestart={handleRestart}
+        />
+      :<Results
+      speed={speed}
+      accuracy={finalAccuracy}
+      correct={finalCorrect}
+      error={error}
+      onRestart={handleRestart}
+      />)
+    )
+    }
     </div>
   )
 }
