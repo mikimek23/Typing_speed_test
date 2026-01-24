@@ -6,7 +6,7 @@ import Starb from '../assets/images/pattern-star-2.svg'
 
 export const Results = ({speed,accuracy,correct,error,onRestart}) => {
   return (
-    <div className="text-neutral-100 py-25 justify-items-center justify-center md:px-50 w-full">
+    <div className="text-neutral-100 pt-25 justify-items-center justify-center md:px-50 w-full">
             <div><img src={Stara} alt="star" className='block absolute  bottom-10 right-10 w-10 sm:top-100 sm:right-30' /></div>
             <div><img src={Starb} alt="" className='block absolute  top-30 left-4 w-5 sm:left-10'/></div>
             <div>

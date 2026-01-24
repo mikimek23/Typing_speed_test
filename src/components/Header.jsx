@@ -4,7 +4,7 @@ import SmallLogo from "../assets/images/logo-small.svg";
 import personal from "../assets/images/icon-personal-best.svg";
 export const Header = ({PersonalBest}) => {
   return (
-    <div className='text-neutral-100 fixed top-0 w-full py-5 lg:px-50 px-4'>
+    <div className='text-neutral-100 fixed bg-neutral-900 top-0 w-full py-5 lg:px-50 px-4 z-1'>
         {/*logo and porsonal Info */}
         <div className='flex flex-1 justify-between '>
             <img src={LargeLogo} alt="logo" class='w-50 sm:block hidden' />

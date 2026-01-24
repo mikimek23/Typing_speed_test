@@ -4,7 +4,7 @@ import Restart from '../assets/images/icon-restart.svg'
 import Confetti from '../assets/images/pattern-confetti.svg'
 export const BetResult = ({speed,accuracy,correct,error,onRestart}) => {
   return (
-     <div className=" text-neutral-100 py-25 justify-items-center justify-center md:px-50 w-full px-4">
+     <div className=" text-neutral-100 pt-25 justify-items-center justify-center md:px-50 w-full px-4 overflow-hidden border h-screen">
             <div>
                  <img src={Beat} alt="Completed" className='border-none' />
             </div>

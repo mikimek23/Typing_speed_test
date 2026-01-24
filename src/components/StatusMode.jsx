@@ -57,8 +57,9 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
     const handleChange=(e)=>{
         const value= e.target.value
         setTyped(value)
+
         setStatus('running')
-    }
+}
 
     // wpm
     useEffect(()=>{
@@ -85,12 +86,13 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         setCorrect(userInput)
 
     })
-
     
     useEffect(()=>{
         // finish status
         if(status!='running') return;
-        if((typed.length===text.length) && text.length>0 ||(isMode==="Timed(60s)" && elapsedTime===0)){
+        const textFinish=(typed.length===text.length) && text.length>0
+        const timeFinish=(isMode==="Timed(60s)" && elapsedTime===0)
+        if(textFinish ||timeFinish){
         setIsRunning(false)
         setTyping(false)
         setStatus('finished')
@@ -108,12 +110,17 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
             parentStatus?.("result")
         }
     })
-    
+    //don't typing and incorrect manager
+    useEffect(()=>{
+        const correctController=(typed.length-correct)>(Math.round(text.length/2))
+        const timeController=(typed.length===0)&&(isMode==='Timed(60s)'?elapsedTime<=30:elapsedTime>60)
+        if(correctController||timeController) resetTest();
+    })
   return (
-    <div className='text-neutral-100  w-full py-5 lg:px-20 px-4'>
+    <div className='text-neutral-100  w-full pt-5 lg:px-20 px-4 max-h-screen relative bg-neutral-900 '>
 
         {/* status info  and mode*/}
-        <div className='lg:flex justify-between mt-20 '>
+        <div className='lg:flex justify-between mt-18  bg-neutral-900 z-1 '>
             {/* status */}
             <div className='flex justify-between md:justify-start w-fit  py-2 text-2xl lg:text-[1em] h-fit  '>
                <div className="flex flex-col md:flex-row h-fit ">
@@ -172,7 +179,7 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
                 </div>
 
                 {/* Mobile View */}
-                <div className='flex gap-2 justify-evenly w-full md:hidden'>
+                <div className='flex gap-2 justify-start sm:ml-5 w-full md:hidden'>
                     <DropDown
                     options={Difficulty}
                     SetOptions={setDifficulty}
@@ -196,6 +203,7 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
                     inputRef={inputRef}
                     handleChange={handleChange}
                     onRestart={resetTest}
+                    setStatus={setStatus}
                 />
        
     </div>

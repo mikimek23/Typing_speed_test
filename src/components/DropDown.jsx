@@ -1,9 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DownArow from '../assets/images/icon-down-arrow.svg'
 export const DropDown = ({options,SetOptions,isRunning}) => {
    const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(options[0]); 
-
+  const [selected, setSelected] = useState(options[0]);
+  
+  useEffect(()=>{
+    if(isRunning){
+    setIsOpen(false)
+  }
+  },[isRunning]) 
+  
   return (
     <div className="relative w-48 font-sora font-bold text-sm">
       
