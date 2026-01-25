@@ -4,7 +4,7 @@ import Restart from '../assets/images/icon-restart.svg'
 import Confetti from '../assets/images/pattern-confetti.svg'
 export const BetResult = ({speed,accuracy,correct,error,onRestart}) => {
   return (
-     <div className=" text-neutral-100 pt-25 justify-items-center justify-center md:px-50 w-full px-4 overflow-hidden border h-screen">
+     <div className=" text-neutral-100 pt-25 justify-items-center justify-center md:px-50 w-full px-4 overflow-hidden h-screen">
             <div>
                  <img src={Beat} alt="Completed" className='border-none' />
             </div>
@@ -21,7 +21,7 @@ export const BetResult = ({speed,accuracy,correct,error,onRestart}) => {
     
                 <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>
                     <span className='text-neutral-500'>Accuracy:</span>
-                    <p className='font-bold text-red-500 md:text-2xl'>{accuracy}%</p>
+                    <p className={`font-bold  md:text-2xl ${accuracy===100?'text-green-500':'text-red-500'}`}>{accuracy}%</p>
                 </div>
     
                 <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>

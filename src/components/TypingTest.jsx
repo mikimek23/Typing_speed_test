@@ -5,7 +5,7 @@ import Displaytext from './Displaytext'
 import { DropDown } from './DropDown';
 
 
-export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError, setStatus:parentStatus}) => {
+export const TypingTest = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError, setStatus:parentStatus}) => {
     const inputRef=useRef(null)
     const [isMode,setIsMode]=useState('Timed(60s)');
     const [difficulty,setDifficulty]=useState('Easy')
@@ -20,6 +20,8 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
     const [typing,setTyping]=useState(true)
     const [status,setStatus]=useState('idle')
     const [timerKey, setTimerKey] = useState(0);
+    const [totalError,setTotalEror]=useState(0)
+    const [keyPressed, setKeyPressed]=useState(0)
     
  
     const Difficulty=["Easy","Medium", "Hard"]
@@ -30,8 +32,13 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
        const key = diff || 'Easy'
     const list = Paragraphs[key] || []
     if (!Array.isArray(list) || list.length === 0) return ''
-    const index = Math.floor(Math.random() * list.length)
+    let prev=0
+    let index;
+    do{
+     index = Math.floor(Math.random() * list.length)
+    }while(prev===index)
     const item = list[index]
+    prev=index;
     return (item && (item.text || item)) || ''
 
     }
@@ -39,6 +46,8 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         setTimerKey(k=>k+1)
         setStatus('idle')
         setTyped('')
+        setTotalEror(0)
+        setKeyPressed(0)
         setText(generateText(difficulty))
         setIsRunning(false)
         setElapsedTime(isMode === "Timed(60s)" ? 60 : 0)
@@ -48,16 +57,36 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         setCorrect(0)
         setTyping(true)
         inputRef.current?.focus()
+        loadText()
+    }
+    // text loader
+    const loadText=()=>{
+        const newText=generateText(difficulty)
+        setText(newText)
     }
     useEffect(()=>{
-        setText(generateText(difficulty))
+        loadText()
     },[difficulty])
 
     // input handler
     const handleChange=(e)=>{
-        const value= e.target.value
-        setTyped(value)
+        const userInput= e.target.value
 
+        if(userInput.length > typed.length){
+            const charIndex=userInput.length -1
+            const enteredChar=userInput[charIndex]
+            const correctChar=text[charIndex]
+            setKeyPressed(prev=>prev + 1)
+
+            if(enteredChar != correctChar){
+                setTotalEror(prev=>prev + 1)
+            }
+        }
+        setCorrect(keyPressed-totalError)
+        setTyped(userInput)
+        setShowMode(true)
+        setIsRunning(true)
+        inputRef.current?.focus()
         setStatus('running')
 }
 
@@ -65,27 +94,23 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
     useEffect(()=>{
     let minute=(60-elapsedTime)/60;
      if(isMode==="Timed(60s)"){
-        setWpm(minute?Math.round(typed.length/(5*minute)):0)
+        setWpm(minute?Math.round(correct/(5*minute)):0)
     }else{
         minute=elapsedTime/60;
-        setWpm(minute?Math.round(typed.length/(5*minute)):0)
+        setWpm(minute?Math.round(correct/(5*minute)):0)
     } 
 
     },[isMode,elapsedTime])
 
     // accuracy
     useEffect(()=>{
-        const userInput=typed
-        .split('')
-        .filter((char,i)=>char===text[i])
-        .length
-        const accu=typed.length? (userInput/(typed.length))*100 : 100;
 
-        setAccuracy(Math.round(accu))
+        const accu=keyPressed > 0
+        ?Math.floor(((keyPressed-totalError)/keyPressed)*100)
+        :100
+        setAccuracy(accu)
 
-        setCorrect(userInput)
-
-    })
+    },[keyPressed,totalError])
     
     useEffect(()=>{
         // finish status
@@ -105,16 +130,18 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         if(!typing){
             setSpeed?.(wpm)
             setFinalAccuracy?.(accuracy)
-            setFinalCorrect?.(correct)
-            setError?.(typed.length-correct)
+            setFinalCorrect?.(typed
+                .split('')
+                .filter((char,index)=>char === text[index])
+                .length
+            )
+            setError?.(typed
+                .split('')
+                .filter((char,index)=>char !=text[index])
+                .length
+            )
             parentStatus?.("result")
         }
-    })
-    //don't typing and incorrect manager
-    useEffect(()=>{
-        const correctController=(typed.length-correct)>(Math.round(text.length/2))
-        const timeController=(typed.length===0)&&(isMode==='Timed(60s)'?elapsedTime<=30:elapsedTime>60)
-        if(correctController||timeController) resetTest();
     })
   return (
     <div className='text-neutral-100  w-full pt-5 lg:px-20 px-4 max-h-screen relative bg-neutral-900 '>
@@ -122,7 +149,7 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
         {/* status info  and mode*/}
         <div className='lg:flex justify-between mt-18  bg-neutral-900 z-1 '>
             {/* status */}
-            <div className='flex justify-between md:justify-start w-fit  py-2 text-2xl lg:text-[1em] h-fit  '>
+            <div className='flex justify-between md:justify-start w-fit  py-2 sm:text-2xl lg:text-[1em] h-fit  '>
                <div className="flex flex-col md:flex-row h-fit ">
                 <span className='text-neutral-400 px-1   text-center'>WPM:</span>
                 <span className='font-bold  text-center '>{wpm}</span>
@@ -205,6 +232,10 @@ export const StatusMode = ({setSpeed,setFinalAccuracy,setFinalCorrect, setError,
                     onRestart={resetTest}
                     setStatus={setStatus}
                 />
+                <div className="text-neutral-100 w-full text-center fixed bottom-0 text-[0.75em] z-0">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" className="text-blue-500 hover:text-blue-400 hover:underline">Frontend Mentor</a>. 
+    Coded by <a href="https://github.com/mikimek23" className="text-blue-500 hover:text-blue-400 hover:underline">Mikiyas Mekbib</a>.
+  </div>
        
     </div>
   )

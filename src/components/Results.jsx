@@ -28,7 +28,7 @@ export const Results = ({speed,accuracy,correct,error,onRestart}) => {
     
                 <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>
                     <span className='text-neutral-500'>Accuracy:</span>
-                    <p className='font-bold text-red-500 md:text-2xl'>{accuracy}%</p>
+                    <p className={`font-bold  md:text-2xl ${accuracy===100?'text-green-500':'text-red-500'}`}>{accuracy}%</p>
                 </div>
     
                 <div className='border w-full sm:w-30 m-2 p-2 border-neutral-500 rounded-lg '>

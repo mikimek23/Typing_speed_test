@@ -12,10 +12,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+yarn.debug.log*
+yarn.error.log*
+npm-debug.log*
 
 # Editor directories and files
 .vscode/*

@@ -13,8 +13,8 @@ const Displaytext = ({ text, typed, showMode, setShowMode, setIsRunning, inputRe
     }
   },[typed])
   return (
-    <div className='relative '>
-      <div className='w-full fixed top-60 md:top-54 lg:top-39 inset-0 overflow-hidden justify-items-center content-center backdrop-blur-xs box-border' 
+    <div className='relative w-full'>
+      <div className='w-full fixed top-52  md:top-54 lg:top-39 inset-0 overflow-hidden justify-items-center content-center backdrop-blur-xs box-border z-1' 
         onClick={() => {
           setShowMode(true)
           setIsRunning(true)
@@ -37,7 +37,10 @@ const Displaytext = ({ text, typed, showMode, setShowMode, setIsRunning, inputRe
         <p className="font-bold">Or click the text and start typing</p>
       </div>
 
-      <p className='text-neutral-400 cursor-text text-3xl py-5 text-left max-h-80 overflow-y-scroll leading-relaxed [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+      <p 
+      onClick={()=>inputRef.current?.focus()}
+      className='text-neutral-400 cursor-text text-3xl py-5 text-left max-h-80 overflow-y-scroll leading-relaxed [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
+      >
         {text.split('').map((char, index) => {
           let className = ''
           if (index < typed.length) {

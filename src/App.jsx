@@ -5,7 +5,7 @@ import { BetResult } from "./components/BetResult"
 import { FirstResult } from "./components/FirstResult"
 import { Header } from "./components/Header"
 import { Results } from "./components/Results"
-import { StatusMode } from "./components/StatusMode"
+import { TypingTest } from "./components/TypingTest"
 
 
 function App() {
@@ -14,18 +14,21 @@ const [finalAccuracy,setFinalAccuracy]=useState(100)
 const [finalCorrect,setFinalCorrect]=useState(0)
 const [error,setError]=useState(0)
 const [status,setStatus]=useState("Typing")
-const [personalBest,setPersonalBest]=useState(0)
+const [personalBest,setPersonalBest]=useState(()=>{
+  const highScore=localStorage.getItem("highScore")
+  return highScore?JSON.parse(highScore):0
+})
 const [trial,setTrial]=useState('')
 useEffect(() => {
-  setPersonalBest(prevBest => {
-    if (speed > prevBest) {
-      setTrial(prevBest === 0 ? "first" : "high");
-      return speed;
+  if(speed>personalBest){
+    if(personalBest===0){ 
+      setTrial('first')
     }else{
-      setTrial('')
+      setTrial('high')
     }
-    return prevBest;
-  });
+    setPersonalBest(speed)
+    localStorage.setItem("highScore",JSON.stringify(speed))
+  }
 }, [speed]);
 
 const handleRestart = () => {
@@ -41,7 +44,7 @@ const handleRestart = () => {
       <Header
       PersonalBest={personalBest}
       />
-     {status==="Typing"?<StatusMode
+     {status==="Typing"?<TypingTest
       setSpeed={setSpeed}
       setFinalAccuracy={setFinalAccuracy}
       setFinalCorrect={setFinalCorrect}
