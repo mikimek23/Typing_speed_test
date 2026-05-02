@@ -1,6 +1,13 @@
-import app from './app'
-const PORT = process.env.PORT || 3000
+import app from './app.js'
+import path from 'node:path'
+import dotenv from 'dotenv'
+import { getEnv, validateEnv } from './config/env.js'
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
+
+validateEnv()
+
+const env = getEnv()
+app.listen(env.port, () => {
+  console.log(`Server is running on port ${env.port}`)
 })
