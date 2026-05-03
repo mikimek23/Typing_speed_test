@@ -37,7 +37,6 @@ export const authMiddleware = (
       id: decoded.id,
       email: decoded.email,
     }
-    console.log(req.user)
     next()
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {

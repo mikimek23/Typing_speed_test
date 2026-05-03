@@ -3,6 +3,7 @@ import { errorHandler } from './middlewares/error.middleware.js'
 import userRouter from './routes/auth.routes.js'
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
+import textsRouter from './routes/texts.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -15,5 +16,6 @@ app.get('/api/health', (req, res) => {
   })
 })
 app.use('/api/auth', userRouter)
+app.use('/api/texts', textsRouter)
 app.use(errorHandler)
 export default app
