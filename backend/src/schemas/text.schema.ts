@@ -25,7 +25,7 @@ export const UpdateTextSchema = z.object({
   content: z
     .string()
     .trim()
-    .min(20, 'Content must be at least 100 characters')
+    .min(20, 'Content must be at least 20 characters')
     .max(50000, 'Content is too long')
     .optional(),
   difficulty: z.enum(['easy', 'medium', 'hard']).optional(),

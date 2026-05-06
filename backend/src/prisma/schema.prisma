@@ -24,30 +24,58 @@ enum Source {
   USER
 }
 
+enum Mode {
+  TIMED
+  PASSAGE
+}
+
 // models
 model User {
-  id               String   @id @default(uuid()) @db.Uuid
+  id               String          @id @default(uuid()) @db.Uuid
   name             String
-  email            String   @unique
+  email            String          @unique
   password         String
   refreshTokenHash String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt @db.Timestamptz(3)
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt @db.Timestamptz(3)
   texts            Text[]
+  typingResults    TypingResults[]
 
   @@index([email])
 }
 
 model Text {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String
-  content     String
-  difficulty  Difficulty
-  source_type Source
-  wordCount   Int
-  user_id     String? @db.Uuid
-  user        User?    @relation(fields: [user_id], references: [id])
-  is_public   Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id            String          @id @default(uuid()) @db.Uuid
+  title         String
+  content       String
+  difficulty    Difficulty
+  source_type   Source
+  wordCount     Int
+  user_id       String?         @db.Uuid
+  user          User?           @relation(fields: [user_id], references: [id])
+  is_public     Boolean         @default(false)
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  typingResults TypingResults[]
+
+  @@index([user_id])
+}
+
+model TypingResults {
+  id                  String   @id @default(uuid()) @db.Uuid
+  user_id             String   @db.Uuid
+  user                User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  text_id             String?  @db.Uuid
+  text                Text?    @relation(fields: [text_id], references: [id], onDelete: SetNull)
+  mode                Mode
+  durationSeconds     Int?
+  wpm                 Int
+  accuracy            Int
+  correctCharacters   Int
+  incorrectCharacters Int
+  totalKeyPress       Int
+  completedAt         DateTime @default(now())
+
+  @@index([user_id])
+  @@index([completedAt])
 }

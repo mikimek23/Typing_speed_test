@@ -5,6 +5,7 @@ import {
 } from '../generated/prisma/enums.js'
 import { AppError } from '../utils/AppError.js'
 import { AddTextInput, UpdateTextInput } from '../schemas/text.schema.js'
+import { Prisma } from '../generated/prisma/browser.js'
 
 const difficultyMap = {
   easy: DifficultyEnum.EASY,
@@ -36,7 +37,6 @@ const normalizeDifficulty = (difficulty: unknown) => {
 
 export const getDefaultTextsService = async (difficulty: unknown) => {
   const normalizedDifficulty = normalizeDifficulty(difficulty)
-
   const texts = await prisma.text.findMany({
     where: {
       source_type: SourceEnum.DEFAULT,
@@ -173,7 +173,11 @@ export const updateMyTextService = async (
   if (!existText) {
     throw new AppError('Not Found', 404)
   }
-  const updateData: UpdateTextInput = {}
+  type TextUpdateData = Pick<
+    Prisma.TextUpdateInput,
+    'title' | 'content' | 'difficulty'
+  >
+  const updateData: Partial<TextUpdateData> = {}
 
   if (data.title !== undefined) {
     updateData.title = data.title.trim()
