@@ -4,7 +4,7 @@ import {
   isAuthenticated,
   isInitialized,
   subscribeAuth,
-} from '../layout/tokenStore'
+} from './tokenStore'
 
 export const useAuth = () => {
   const state = useSyncExternalStore(subscribeAuth, getAuthState, getAuthState)

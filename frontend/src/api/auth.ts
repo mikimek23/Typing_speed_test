@@ -1,45 +1,62 @@
-import type { AxiosResponse } from 'axios'
-import { api, setApiAuthFailureHandler } from './axios'
+import { api, setApiAuthFailureHandler, unwrapResponse } from './axios'
 import {
   clearSession,
   setAccessToken,
   setAuthInitialized,
   setCurrentUser,
   setSession,
-} from '../layout/tokenStore'
+} from '../hooks/tokenStore'
 
-const unwrap = (response: AxiosResponse) => response?.data?.data ?? null
-type authPayload = {
+type AuthPayload = {
   name: string
   email: string
   password: string
 }
-export const userRegister = async (payload: authPayload) => {
-  const response = await api.post('/api/register', payload)
-  return unwrap(response)
+
+type LoginPayload = Omit<AuthPayload, 'name'>
+
+type AuthResponse = {
+  accessToken: string | null
+  user: {
+    id: string
+    name: string
+    email: string
+    created_at: string
+  } | null
 }
-export const userLogin = async (payload: Omit<authPayload, 'name'>) => {
-  const response = await api.post('/api/login', payload)
-  const data = unwrap(response)
+
+let bootstrapPromise: Promise<void> | null = null
+
+export const userRegister = async (payload: AuthPayload) => {
+  const response = await api.post('/auth/register', payload)
+  return unwrapResponse<AuthResponse['user']>(response)
+}
+
+export const userLogin = async (payload: LoginPayload) => {
+  const response = await api.post('/auth/login', payload)
+  const data = unwrapResponse<AuthResponse>(response)
   setSession({
     accessToken: data?.accessToken,
     user: data?.user,
   })
   return data
 }
-export const refereshAccessesToken = async () => {
+
+export const refreshAccessToken = async () => {
   const response = await api.post('/auth/refresh')
-  const data = unwrap(response)
+  const data = unwrapResponse<AuthResponse>(response)
   if (data?.accessToken) setAccessToken(data.accessToken)
   if (data?.user) setCurrentUser(data.user)
   return data
 }
-export const feachcurrentUser = async () => {
+
+export const fetchCurrentUser = async () => {
   const response = await api.get('/auth/me')
-  const data = unwrap(response)
+  const data = unwrapResponse<AuthResponse['user']>(response)
   setCurrentUser(data)
   return data
 }
+
 export const userLogOut = async () => {
   try {
     await api.post('/auth/logout')
@@ -47,13 +64,14 @@ export const userLogOut = async () => {
     clearSession()
   }
 }
-export const bootstrapSession = async () => {
+
+const runBootstrapSession = async () => {
   try {
-    const refreshed = await refereshAccessesToken()
+    const refreshed = await refreshAccessToken()
     if (!refreshed?.accessToken) {
       clearSession()
     } else if (!refreshed?.user) {
-      await feachcurrentUser()
+      await fetchCurrentUser()
     }
   } catch {
     clearSession()
@@ -61,6 +79,17 @@ export const bootstrapSession = async () => {
     setAuthInitialized(true)
   }
 }
+
+export const bootstrapSession = async () => {
+  if (!bootstrapPromise) {
+    bootstrapPromise = runBootstrapSession().finally(() => {
+      bootstrapPromise = null
+    })
+  }
+
+  return bootstrapPromise
+}
+
 export const initializeApiAuthHandlers = (
   onAuthFailure: (() => void) | null,
 ) => {
@@ -70,3 +99,6 @@ export const initializeApiAuthHandlers = (
     if (onAuthFailure) onAuthFailure()
   })
 }
+
+export const refereshAccessesToken = refreshAccessToken
+export const feachcurrentUser = fetchCurrentUser

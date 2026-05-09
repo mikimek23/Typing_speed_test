@@ -1,25 +1,71 @@
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import {
   clearSession,
   getAccessToken,
   setAccessToken,
   setCurrentUser,
-} from '../layout/tokenStore'
+} from '../hooks/tokenStore'
 
-const baseURL = import.meta.env.VITE_APT_BASE_URL || 'http://localhost:5001/api'
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_APT_BASE_URL ||
+  'http://localhost:5001/api'
+
+type ApiEnvelope<T> = {
+  success?: boolean
+  message?: string
+  data?: T
+}
+
 export const api = axios.create({
   baseURL,
   withCredentials: true,
 })
+
 const refreshClient = axios.create({
   baseURL,
   withCredentials: true,
 })
+
 let refreshPromise: Promise<string> | null = null
 let onAuthFailure: (() => void) | null = null
-export const setApiAuthFailureHandler = (handler: () => void) => {
+
+export const unwrapResponse = <T>(
+  response: AxiosResponse<T | ApiEnvelope<T>>,
+) => {
+  const payload = response.data
+
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    'data' in payload &&
+    ('message' in payload || 'success' in payload)
+  ) {
+    return (payload as ApiEnvelope<T>).data as T
+  }
+
+  return payload as T
+}
+
+export const getApiErrorMessage = (
+  error: unknown,
+  fallback = 'Something went wrong. Please try again.',
+) => {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message
+    if (typeof message === 'string' && message.trim()) return message
+    if (error.message) return error.message
+  }
+
+  if (error instanceof Error && error.message) return error.message
+
+  return fallback
+}
+
+export const setApiAuthFailureHandler = (handler: (() => void) | null) => {
   onAuthFailure = handler
 }
+
 const isAuthEndpoint = (url: string = '') => {
   return (
     url.includes('/auth/login') ||
@@ -53,7 +99,7 @@ api.interceptors.response.use(
               const token = res.data?.data?.accessToken
               const user = res.data?.data?.user
               if (!token)
-                throw new Error('No access token form refresh endpoint')
+                throw new Error('No access token from refresh endpoint')
               setAccessToken(token)
               if (user) setCurrentUser(user)
               return token
