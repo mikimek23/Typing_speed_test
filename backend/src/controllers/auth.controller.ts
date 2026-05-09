@@ -3,6 +3,7 @@ import {
   loginService,
   logOutService,
   meService,
+  refreshService,
   registerService,
 } from '../services/auth.service.js'
 import { AppError } from '../utils/AppError.js'
@@ -31,6 +32,36 @@ export const meController = asyncHandler(async (req, res) => {
   }
   const user = await meService(req.user.id)
   res.status(200).json(user)
+})
+
+export const refreshController = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken
+  if (!refreshToken) {
+    res.status(200).json({
+      message: 'No active session',
+      data: {
+        accessToken: null,
+        user: null,
+      },
+    })
+    return
+  }
+  const session = await refreshService(refreshToken)
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    secure: env.isProduction,
+    sameSite: env.isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/api',
+    domain: env.cookieDomain,
+  })
+  res.status(200).json({
+    message: 'Access token refreshed',
+    data: {
+      accessToken: session.accessToken,
+      user: session.user,
+    },
+  })
 })
 export const logOutController = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies?.refreshToken
