@@ -9,8 +9,9 @@ import jwt from 'jsonwebtoken'
 type TokenPayload = {
   id: string
   email: string
+  type: 'refresh' | 'access'
   iat?: number
-  exp?: number
+  exp: number
 }
 const verifyRefreshToken = (refreshToken: string) => {
   const env = getEnv()
@@ -18,10 +19,7 @@ const verifyRefreshToken = (refreshToken: string) => {
     refreshToken,
     env.refreshTokenSecret,
   ) as TokenPayload
-  return {
-    id: decoded.id,
-    email: decoded.email,
-  }
+  return decoded
 }
 const hashRefreshToken = (refreshToken: string) => {
   return crypto.createHash('sha256').update(refreshToken).digest('hex')
@@ -68,18 +66,23 @@ export const loginService = async (data: LoginInput) => {
   const accessToken = generateAccessToken({
     id: foundUser.id,
     email: foundUser.email,
+    type: 'access',
   })
   const refreshToken = generateRefreshToken({
     id: foundUser.id,
     email: foundUser.email,
+    type: 'refresh',
   })
   const refreshTokenHash = hashRefreshToken(refreshToken)
+  const payload = verifyRefreshToken(refreshToken)
+  console.log(payload.exp)
   const user = await prisma.user.update({
     where: {
       email: foundUser.email,
     },
     data: {
       refreshTokenHash: refreshTokenHash,
+      refreshTokenExpiresAt: new Date(payload.exp * 1000),
     },
     select: {
       id: true,
@@ -106,6 +109,79 @@ export const meService = async (id: string) => {
     throw new AppError('Not found', 404)
   }
   return user
+}
+export const refreshService = async (refreshToken: string) => {
+  let payload
+  try {
+    payload = verifyRefreshToken(refreshToken)
+  } catch {
+    throw new AppError('Invalid referesh token', 403)
+  }
+  if (payload.type && payload.type !== 'refresh') {
+    throw new AppError('Invalid token type', 403)
+  }
+  console.log(payload.id)
+  const user = await prisma.user.findUnique({
+    where: {
+      id: payload.id,
+    },
+  })
+  if (!user || !user.refreshTokenHash) {
+    throw new AppError('invalid referesh token', 403)
+  }
+  if (
+    user.refreshTokenExpiresAt &&
+    user.refreshTokenExpiresAt.getTime() < Date.now()
+  ) {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshTokenHash: null,
+        refreshTokenExpiresAt: null,
+      },
+    })
+    throw new AppError('Refresh token expired', 403)
+  }
+  const currentHash = hashRefreshToken(refreshToken)
+
+  if (currentHash !== user.refreshTokenHash) {
+    throw new AppError('Invalid refresh token', 403)
+  }
+
+  const newAccessToken = generateAccessToken({
+    id: user.id,
+    email: user.email,
+    type: 'access',
+  })
+  const newRefreshToken = generateRefreshToken({
+    id: user.id,
+    email: user.email,
+    type: 'refresh',
+  })
+  const newPayload = verifyRefreshToken(newRefreshToken)
+  const hashedRefreshToken = hashRefreshToken(newRefreshToken)
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: newPayload.id,
+    },
+    data: {
+      refreshTokenHash: hashedRefreshToken,
+      refreshTokenExpiresAt: new Date(newPayload.exp * 1000),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      created_at: true,
+    },
+  })
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+    user: updatedUser,
+  }
 }
 export const logOutService = async (refreshToken: string) => {
   if (!refreshToken) {
@@ -135,6 +211,7 @@ export const logOutService = async (refreshToken: string) => {
       },
       data: {
         refreshTokenHash: null,
+        refreshTokenExpiresAt: null,
       },
     })
   } catch {

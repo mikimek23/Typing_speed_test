@@ -5,6 +5,7 @@ const env = getEnv()
 type JwtPayload = {
   id: string
   email: string
+  type: 'refresh' | 'access'
 }
 export const generateAccessToken = (payload: JwtPayload) => {
   try {
